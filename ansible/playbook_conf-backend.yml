@@ -1,33 +1,35 @@
----
-- name: Плейбук установки и настройки бэкенда
-  hosts: backend_nodes
+- name: Установка и настройка бэкендов
+  hosts: backend_hosts
   become: true
   tasks:
-    - name: Копирование конфигурационных файлов backend1
-      copy:
-        src: /nodes/backend1/index.html
-        dest: /var/www/html/index.html
+    - name: Создание контейнера backend1
+      docker_container:
+        name: backend1
+        image: debian:latest   # Образ на основе Debian
+        state: started
+        ports:
+          - "8080:80"
+        volumes:
+          - ./backend1/httpd.conf:/etc/apache2/httpd.conf
+          - ./backend1/index.html:/var/www/html/index.html
+        networks:
+          - internal_network
 
-    - name: Копирование конфигурационного файла ports.conf из backend1
-      copy:
-        src: /nodes/backend1/ports.conf
-        dest: /etc/apache2/ports.conf
-      notify: restart apache
-    
-    - name: Копирование конфигурационных файлов backend2
-      copy:
-        src: /nodes/backend1/index.html
-        dest: /var/www/html/index.html
+    - name: Создание контейнера backend2
+      docker_container:
+        name: backend2
+        image: debian:latest   # Образ на основе Debian
+        state: started
+        ports:
+          - "8080:80"
+        volumes:
+          - ./backend2/httpd.conf:/etc/apache2/httpd.conf
+          - ./backend2/index.html:/var/www/html/index.html
+        networks:
+          - internal_network
 
-    - name: Копирование конфигурационного файла ports.conf из backend2
-      copy:
-        src: /nodes/backend1/ports.conf
-        dest: /etc/apache2/ports.conf
-      notify: restart apache
-
-    - name: Перезапуск сервиса Apache
-      service:
-        name: apache2
-        state: restarted
+networks:
+  internal_network:
+    driver: bridge
 
 

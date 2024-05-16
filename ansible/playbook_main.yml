@@ -1,6 +1,7 @@
 - name: Главный плейбук для деплоя
-  hosts: all
-  become: true
+  hosts: localhost
+  connection: local
+  gather_facts: no
   tasks:
     - name: Выполнение плейбука установки и настройки балансировщиков
       include_playbook: playbook_conf-lb.yml
@@ -11,13 +12,5 @@
     - name: Выполнение плейбука установки и настройки бэкенда
       include_playbook: playbook_conf-backend.yml
 
-    - name: Проверка работы кластеризации и балансировки
-      uri:
-        url: http://VipLb:80
-        return_content: yes
-      register: response
 
-    - name: Остановка контейнера с VIP адресом
-      command: docker stop container_with_vip
-      when: "'VIP address' in response.content"
 
