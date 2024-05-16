@@ -10,9 +10,7 @@
         ports:
           - "80:80"
         volumes:
-          - ./lb1/nginx.conf:/etc/nginx/nginx.conf
-        networks:
-          - internal_network
+          - nodes/lb1/nginx.conf:/etc/nginx/nginx.conf
 
     - name: Creating container lb2
       docker_container:
@@ -22,11 +20,4 @@
         ports:
           - "80:80"
         volumes:
-          - ./lb2/nginx.conf:/etc/nginx/nginx.conf
-        networks:
-          - internal_network
-
-networks:
-  internal_network:
-    driver: bridge
-
+          - nodes/lb2/nginx.conf:/etc/nginx/nginx.conf

@@ -7,7 +7,5 @@
         name: pacemaker
         state: present
 
-    - name: Настройка кластера Pacemaker
+    - name: Setup Pacemaker cluster
       command: pcs cluster setup --force --name mycluster lb1 lb2
-  
-
