@@ -1,15 +1,15 @@
-- name: Главный плейбук для деплоя
+- name: Main playbook for deploy 
   hosts: localhost
   connection: local
   gather_facts: no
   tasks:
-    - name: Выполнение плейбука установки и настройки балансировщиков
+    - name: Executing the installation playbook and configuration settings
       include_playbook: playbook_conf-lb.yml
 
-    - name: Выполнение плейбука установки и настройки кластеризации балансировщиков
+    - name: Executing the installation playbook and configuring balancer clustering
       include_playbook: playbook_conf-cluster-lb.yml
 
-    - name: Выполнение плейбука установки и настройки бэкенда
+    - name: Executing the installation and configuration playbook backend 
       include_playbook: playbook_conf-backend.yml
 
 

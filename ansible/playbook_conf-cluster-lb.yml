@@ -1,8 +1,8 @@
-- name: Плейбук установки и настройки кластеризации балансировщиков
+- name: Balancer clustering installation and configuration playbook
   hosts: lb_nodes
   become: true
   tasks:
-    - name: Установка Pacemaker
+    - name: Installation Pacemaker
       package:
         name: pacemaker
         state: present

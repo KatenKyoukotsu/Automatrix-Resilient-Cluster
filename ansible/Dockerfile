@@ -1,19 +1,19 @@
-# Используем образ Python для работы с Ansible
+# Using python for ansible 
 FROM python:3.9
 
-# Устанавливаем зависимости (ansible, docker)
+# install pachage 
 RUN pip install ansible docker
 
-# Копируем плейбуки Ansible и конфигурацию
+# copy playbook and conf
 COPY ansible/ /ansible
 
-# Копируем все Dockerfile в корень контейнера
+# copy all Dockerfile 
 COPY ./*.Dockerfile /
 
-# Устанавливаем рабочую директорию
+# Apply working directory 
 WORKDIR /ansible
 
-# Устанавливаем переменные окружения для Ansible (необязательно)
+# install virual environment for Ansimble
 ENV ANSIBLE_HOSTS=/etc/ansible/hosts
 ENV ANSIBLE_CONFIG=/ansible/ansible.cfg
 

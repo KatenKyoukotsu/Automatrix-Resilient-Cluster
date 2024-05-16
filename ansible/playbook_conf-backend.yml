@@ -1,8 +1,8 @@
-- name: Установка и настройка бэкендов
+- name: Installing and configuration settsings backend 
   hosts: backend_hosts
   become: true
   tasks:
-    - name: Создание контейнера backend1
+    - name: Creating container backend1
       docker_container:
         name: backend1
         image: debian:latest   # Образ на основе Debian
@@ -15,7 +15,7 @@
         networks:
           - internal_network
 
-    - name: Создание контейнера backend2
+    - name: Creating container backend2
       docker_container:
         name: backend2
         image: debian:latest   # Образ на основе Debian

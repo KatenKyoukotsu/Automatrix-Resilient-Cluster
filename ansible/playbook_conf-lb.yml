@@ -1,8 +1,8 @@
-- name: Установка и настройка балансировщиков
+- name: Installation and configuration of balancers
   hosts: lb_hosts
   become: true
   tasks:
-    - name: Создание контейнера lb1
+    - name: Creating container lb1
       docker_container:
         name: lb1
         image: nginx:latest
@@ -14,7 +14,7 @@
         networks:
           - internal_network
 
-    - name: Создание контейнера lb2
+    - name: Creating container lb2
       docker_container:
         name: lb2
         image: nginx:latest
