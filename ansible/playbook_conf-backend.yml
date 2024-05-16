@@ -10,10 +10,8 @@
         ports:
           - "8080:80"
         volumes:
-          - ./backend1/httpd.conf:/etc/apache2/httpd.conf
-          - ./backend1/index.html:/var/www/html/index.html
-        networks:
-          - internal_network
+          - nodes/backend1/ports.conf:/etc/apache2/ports.conf
+          - nodes/backend1/index.html:/var/www/html/index.html
 
     - name: Creating container backend2
       docker_container:
@@ -23,13 +21,5 @@
         ports:
           - "8080:80"
         volumes:
-          - ./backend2/httpd.conf:/etc/apache2/httpd.conf
-          - ./backend2/index.html:/var/www/html/index.html
-        networks:
-          - internal_network
-
-networks:
-  internal_network:
-    driver: bridge
-
-
+          - nodes/backend2/ports.conf:/etc/apache2/ports.conf
+          - nodes/backend2/index.html:/var/www/html/index.html
