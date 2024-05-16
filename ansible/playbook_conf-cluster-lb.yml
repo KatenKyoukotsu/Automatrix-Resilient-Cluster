@@ -1,0 +1,13 @@
+- name: Плейбук установки и настройки кластеризации балансировщиков
+  hosts: lb_nodes
+  become: true
+  tasks:
+    - name: Установка Pacemaker
+      package:
+        name: pacemaker
+        state: present
+
+    - name: Настройка кластера Pacemaker
+      command: pcs cluster setup --force --name mycluster lb1 lb2
+  
+

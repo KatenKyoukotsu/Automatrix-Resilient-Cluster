@@ -1,0 +1,33 @@
+---
+- name: Плейбук установки и настройки бэкенда
+  hosts: backend_nodes
+  become: true
+  tasks:
+    - name: Копирование конфигурационных файлов backend1
+      copy:
+        src: /nodes/backend1/index.html
+        dest: /var/www/html/index.html
+
+    - name: Копирование конфигурационного файла ports.conf из backend1
+      copy:
+        src: /nodes/backend1/ports.conf
+        dest: /etc/apache2/ports.conf
+      notify: restart apache
+    
+    - name: Копирование конфигурационных файлов backend2
+      copy:
+        src: /nodes/backend1/index.html
+        dest: /var/www/html/index.html
+
+    - name: Копирование конфигурационного файла ports.conf из backend2
+      copy:
+        src: /nodes/backend1/ports.conf
+        dest: /etc/apache2/ports.conf
+      notify: restart apache
+
+    - name: Перезапуск сервиса Apache
+      service:
+        name: apache2
+        state: restarted
+
+
