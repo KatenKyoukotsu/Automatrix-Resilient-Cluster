@@ -5,7 +5,7 @@
     - name: Creating container lb1
       docker_container:
         name: lb1
-        image: nginx:latest
+        image: debian:latest
         state: started
         ports:
           - "80:80"
@@ -15,7 +15,7 @@
     - name: Creating container lb2
       docker_container:
         name: lb2
-        image: nginx:latest
+        image: debian:latest
         state: started
         ports:
           - "80:80"

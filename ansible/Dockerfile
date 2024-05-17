@@ -5,13 +5,7 @@ FROM python:3.9
 RUN pip install ansible docker
 
 # copy playbook and conf
-COPY ansible/ /ansible
-
-# copy all Dockerfile 
-COPY ./*.Dockerfile /
-
-# Apply working directory 
-WORKDIR /ansible
+COPY nodes/ ~/
 
 # install virual environment for Ansimble
 ENV ANSIBLE_HOSTS=/etc/ansible/hosts

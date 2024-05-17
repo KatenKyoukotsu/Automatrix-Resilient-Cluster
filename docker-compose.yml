@@ -1,24 +1,48 @@
 services:
+  
   backend1:
-    build: backend1/
+    image: debian:latest
     ports:
       - "8080:5001"
+    networks:
+      - my-network
+    build: backend1/ 
+    command: ["tail", "-f", "/dev/null"]
+
   backend2:
-    build: backend2/
+    image: debian:latest
     ports:
       - "8080:5002"
+    networks: 
+      - my-network
+    build: backend2
+    command: ["tail", "-f", "/dev/null"]
+
   lb1:
-    build: lb1/
+    image: debian:latest
     ports:
       - "80:5003"
+    networks:
+      - my-network
+    build: lb1/
+    command: ["tail", "-f", "/dev/null"]
+
   lb2:
-    build: lb2/
+    image: debian:latest
     ports:
       - "80:5004"
-  ansible:
-    build: ansible/
+    networks: 
+      - my-network
+    build: lb2/
+    command: ["tail", "-f", "/dev/null"]
 
+  ansible:
+    image: debian:latest
+    build: ansible/
+    command: ["tail", "-f", "/dev/null"]
 
 networks:
-  default:
+  my-network:
+    driver: bridge
     internal: true
+
