@@ -7,7 +7,6 @@ services:
     networks:
       - my-network
     build: backend1/ 
-    command: ["tail", "-f", "/dev/null"]
 
   backend2:
     image: debian:latest
@@ -16,18 +15,14 @@ services:
     networks: 
       - my-network
     build: backend2
-    command: ["tail", "-f", "/dev/null"]
 
   lb1:
     image: debian:latest
-    container_name: lb1
     ports:
       - "80:5003"
     networks:
       - my-network
     build: lb1/
-    command: ["tail", "-f", "/dev/null"]
-
   lb2:
     image: debian:latest
     ports:
@@ -35,18 +30,16 @@ services:
     networks: 
       - my-network
     build: lb2/
-    command: ["tail", "-f", "/dev/null"]
 
   ansible:
     image: debian:latest
     build: ansible/
-    command: ["tail", "-f", "/dev/null"]
     networks:
         - my-network
     volumes:
       - ./ansible/playbooks:/ansible/playbooks/
       - /var/run/docker.sock:/var/run/docker.sock
-    entrypoint: ["/bin/sh", "-c", "ansible-playbook /ansible/playbooks/playbook_main.yml"]
+    entrypoint: ["/bin/sh", "-c", "ansible-playbook /ansible/playbooks/playbook_main.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-lb.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-cluster-lb.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-backend.yml"]
     depends_on: 
       - backend1 
       - backend2 

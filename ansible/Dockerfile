@@ -1,8 +1,8 @@
 # Using python for ansible 
-FROM python:3.9
+FROM python3:latest
 
 # install pachage 
-RUN pip install ansible docker
+RUN pip install ansible docker pacemaker
 
 # copy playbook and conf
 COPY nodes/ ~/
