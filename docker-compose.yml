@@ -20,6 +20,7 @@ services:
 
   lb1:
     image: debian:latest
+    container_name: lb1
     ports:
       - "80:5003"
     networks:
@@ -40,6 +41,17 @@ services:
     image: debian:latest
     build: ansible/
     command: ["tail", "-f", "/dev/null"]
+    networks:
+        - my-network
+    volumes:
+      - ./ansible/playbooks:/ansible/playbooks/
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: ["/bin/sh", "-c", "ansible-playbook /ansible/playbooks/playbook_main.yml"]
+    depends_on: 
+      - backend1 
+      - backend2 
+      - lb1 
+      - lb2
 
 networks:
   my-network:

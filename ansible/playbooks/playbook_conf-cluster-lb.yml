@@ -1,0 +1,7 @@
+- name: Installation Pacemaker
+  package:
+    name: pacemaker
+    state: present
+
+- name: Setup Pacemaker cluster
+  command: pcs cluster setup --force --name mycluster lb1 lb2

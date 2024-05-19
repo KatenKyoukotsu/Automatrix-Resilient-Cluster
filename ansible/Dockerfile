@@ -11,3 +11,13 @@ COPY nodes/ ~/
 ENV ANSIBLE_HOSTS=/etc/ansible/hosts
 ENV ANSIBLE_CONFIG=/ansible/ansible.cfg
 
+RUN ansible-galaxy collection install community.docker
+
+RUN mkdir -p /ansible/playbooks 
+
+WORKDIR /ansible/playbooks
+
+COPY ./playbooks /ansible/playbooks
+
+COPY hosts /etc/ansible/hosts
+
