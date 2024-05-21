@@ -9,8 +9,8 @@
     - name: Executing the installation playbook and configuring balancer clustering
       import_tasks: playbook_conf-cluster-lb.yml
 
-    - name: Executing the installation and configuration playbook backend 
-      import_tasks: playbook_conf-backend.yml
+        #    - name: Executing the installation and configuration playbook backend 
+        #import_tasks: playbook_conf-backend.yml
 
 
 

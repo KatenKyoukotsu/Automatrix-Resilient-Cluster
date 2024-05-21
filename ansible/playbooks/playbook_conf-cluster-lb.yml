@@ -1,11 +1,9 @@
-    - name: Install Pacemaker and related packages
-      apt:
+
+    - name: Install Pacemaker
+      pip:
         name:
           - pacemaker
-          - pcs
-          - corosync
-          - crmsh
         state: present
 
-          #- name: Setup Pacemaker cluster
-          # command: pcs cluster setup --force --name clustering_lb lb1 lb2
+    - name: Setup Pacemaker cluster
+      command: pcs cluster setup --force --name clustering_lb lb1 lb2

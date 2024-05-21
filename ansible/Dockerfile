@@ -8,10 +8,12 @@ RUN apt-get update && \
     apt-get install -y \
     software-properties-common \
     python3-pip \ 
-    python3-apt
+    pcs \
+    python3-apt && \
+    apt-get clean
 
 
-RUN pip install ansible docker
+RUN pip install --break-system-packages ansible requests
 
 
 # copy playbook and conf
