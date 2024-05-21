@@ -1,13 +1,11 @@
-- name: Install python3-apt
-  become: yes
-  apt:
-    name: python3-apt
-    state: present
+    - name: Install Pacemaker and related packages
+      apt:
+        name:
+          - pacemaker
+          - pcs
+          - corosync
+          - crmsh
+        state: present
 
-- name: Installation Pacemaker
-  package:
-    name: pacemaker
-    state: present
-
-- name: Setup Pacemaker cluster
-  command: pcs cluster setup --force --name clustering_lb lb1 lb2
+          #- name: Setup Pacemaker cluster
+          # command: pcs cluster setup --force --name clustering_lb lb1 lb2

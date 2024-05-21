@@ -1,4 +1,4 @@
-- name: Main playbook for deploy 
+- name: Main playbook for deploy
   hosts: localhost
   connection: local
   gather_facts: no

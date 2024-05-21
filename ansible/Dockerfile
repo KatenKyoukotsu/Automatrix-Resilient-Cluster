@@ -1,8 +1,18 @@
 # Using python for ansible 
-FROM python3:latest
+FROM debian:latest
 
-# install pachage 
-RUN pip install ansible docker pacemaker
+# install pachage
+ENV DEBIAN_FRONTEND=nonineractive
+
+RUN apt-get update && \
+    apt-get install -y \
+    software-properties-common \
+    python3-pip \ 
+    python3-apt
+
+
+RUN pip install ansible docker
+
 
 # copy playbook and conf
 COPY nodes/ ~/
