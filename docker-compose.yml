@@ -1,53 +1,64 @@
+version: '3.8'
+
 services:
-  
   backend1:
-    image: debian:latest
+    build: backend1/
+    container_name: backend1
     ports:
-      - "8080:5001"
+      - "8081:8080"
+      - "2221:22"
     networks:
       - my-network
-    build: backend1/ 
 
   backend2:
-    image: debian:latest
+    build: backend2/
+    container_name: backend2
     ports:
-      - "8080:5002"
-    networks: 
+      - "8082:8080"
+      - "2222:22"
+    networks:
       - my-network
-    build: backend2
 
   lb1:
-    image: debian:latest
+    build: lb1/
+    container_name: lb1
     ports:
-      - "80:5003"
+      - "80:80"
+      - "2223:22"
+    depends_on:
+      - backend1
+      - backend2
     networks:
       - my-network
-    build: lb1/
+
   lb2:
-    image: debian:latest
-    ports:
-      - "80:5004"
-    networks: 
-      - my-network
     build: lb2/
+    container_name: lb2
+    ports:
+      - "81:80"
+      - "2224:22"
+    depends_on:
+      - backend1
+      - backend2
+    networks:
+      - my-network
 
   ansible:
-    image: debian:latest
     build: ansible/
+    container_name: ansible
     networks:
-        - my-network
+      - my-network
     volumes:
-      - ./ansible/playbooks:/ansible/playbooks/
-      - /var/run/docker.sock:/var/run/docker.sock
-    entrypoint: ["/bin/sh", "-c", "ansible-playbook /ansible/playbooks/playbook_main.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-lb.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-cluster-lb.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-backend.yml"]
-    depends_on: 
-      - backend1 
-      - backend2 
-      - lb1 
+      - ./ansible/playbooks:/ansible/playbooks
+      - ./ssh:/root/.ssh
+    entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+    depends_on:
+      - backend1
+      - backend2
+      - lb1
       - lb2
 
 networks:
   my-network:
     driver: bridge
     internal: true
-

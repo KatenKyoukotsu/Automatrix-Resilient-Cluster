@@ -1,21 +1,26 @@
-    - name: Creating container backend1
-      docker_container:
-        name: backend1
-        image: debian:latest   # Образ на основе Debian
-        state: started
-        ports:
-          - "8080:80"
-        volumes:
-          - nodes/backend1/ports.conf:/etc/apache2/ports.conf
-          - nodes/backend1/index.html:/var/www/html/index.html
+- name: Установка и настройка бэкендов
+  hosts: backends
+  become: yes
+  tasks:
+    - name: Установить Apache
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
 
-    - name: Creating container backend2
-      docker_container:
-        name: backend2
-        image: debian:latest   # Образ на основе Debian
+    - name: Копировать HTML файл
+      copy:
+        src: /ansible/playbooks/index.html
+        dest: /var/www/html/index.html
+
+    - name: Настроить Apache для прослушивания на порту 8080
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        line: "Listen 8080"
+        create: yes
+
+    - name: Запустить и включить Apache
+      service:
+        name: apache2
         state: started
-        ports:
-          - "8080:80"
-        volumes:
-          - nodes/backend2/ports.conf:/etc/apache2/ports.conf
-          - nodes/backend2/index.html:/var/www/html/index.html
+        enabled: yes
