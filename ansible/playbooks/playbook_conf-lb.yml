@@ -1,19 +1,21 @@
-- name: Creating container lb1
-  docker_container:
-    name: lb1
-    image: debian:latest
-    state: started
-    ports:
-      - "80:5003"
-    volumes:
-      - /home/igor/Automatrix-Resilient-Cluster/ansible/nodes/lb1/nginx.conf:/etc/nginx/nginx.conf
+- name: Установка и настройка балансировщиков
+  hosts: lb1,lb2
+  become: yes
+  tasks:
+    - name: Установить Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
 
-- name: Creating container lb2
-  docker_container:
-    name: lb2
-    image: debian:latest
-    state: started
-    ports:
-      - "80:5004"
-    volumes:
-      - /home/igor/Automatrix-Resilient-Cluster/ansible/nodes/lb2/nginx.conf:/etc/nginx/nginx.conf
+    - name: Копировать конфигурацию Nginx
+      copy:
+        src: /ansible/playbooks/nginx.conf
+        dest: /etc/nginx/nginx.conf
+
+    - name: Запустить и включить Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+

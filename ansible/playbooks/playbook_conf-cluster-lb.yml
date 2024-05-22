@@ -1,9 +1,45 @@
-
-    - name: Install Pacemaker
-      pip:
+- name: Настройка кластера Pacemaker
+  hosts: lb1,lb2
+  become: yes
+  tasks:
+    - name: Установить Pacemaker и Corosync
+      apt:
         name:
           - pacemaker
+          - corosync
+          - pcs
         state: present
+        update_cache: yes
 
-    - name: Setup Pacemaker cluster
-      command: pcs cluster setup --force --name clustering_lb lb1 lb2
+    - name: Запустить и включить pcsd
+      service:
+        name: pcsd
+        state: started
+        enabled: yes
+
+    - name: Установить пароль для пользователя hacluster
+      expect:
+        command: passwd hacluster
+        responses:
+          Question 1: "Введите новый пароль: "
+          Question 2: "Введите его повторно: "
+        creates: /etc/pcs/pcs.conf
+
+    - name: Авторизовать узлы в кластере
+      command: pcs cluster auth lb1 lb2 --username hacluster --password yourpassword
+
+    - name: Настроить кластер
+      command: pcs cluster setup --force clustering_lb lb1 lb2
+
+    - name: Запустить кластер
+      command: pcs cluster start --all
+
+    - name: Включить кластер для автоматического запуска при загрузке
+      command: pcs cluster enable --all
+
+    - name: Настроить ресурс VIP
+      command: pcs resource create vip ocf:heartbeat:IPaddr2 ip=10.0.0.100 cidr_netmask=24 op monitor interval=30s
+
+    - name: Настроить ресурс Nginx
+      command: pcs resource create nginx systemd:nginx op monitor interval=30s
+

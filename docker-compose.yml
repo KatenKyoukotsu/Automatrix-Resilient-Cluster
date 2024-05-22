@@ -1,39 +1,44 @@
 services:
   
   backend1:
-    image: debian:latest
+    container_name: backend1
     ports:
-      - "8080:5001"
+      - "8081:8080"
+      - "2021:22"
     networks:
       - my-network
     build: backend1/ 
 
   backend2:
-    image: debian:latest
+    container_name: backend2
     ports:
-      - "8080:5002"
+      - "8082:8080"
+      - "2022:22"
     networks: 
       - my-network
     build: backend2
 
   lb1:
-    image: debian:latest
+    container_name: lb1
     ports:
-      - "80:5003"
+      - "80:80"
+      - "2023:22"
     networks:
       - my-network
     build: lb1/
+  
   lb2:
-    image: debian:latest
+    container_name: lb2
     ports:
-      - "80:5004"
+      - "81:80"
+      - "2024:22"
     networks: 
       - my-network
     build: lb2/
 
   ansible:
-    image: debian:latest
     build: ansible/
+    container_name: ansible
     networks:
         - my-network
     volumes:

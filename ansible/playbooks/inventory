@@ -1,0 +1,8 @@
+[loadbalancers]
+lb1
+lb2
+
+[backends]
+backend1
+backend2
+
