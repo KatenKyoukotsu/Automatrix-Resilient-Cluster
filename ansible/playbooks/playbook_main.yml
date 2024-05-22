@@ -1,0 +1,16 @@
+- name: Main playbook for deploy
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Executing the installation playbook and configuration settings
+      import_tasks: playbook_conf-lb.yml
+
+    - name: Executing the installation playbook and configuring balancer clustering
+      import_tasks: playbook_conf-cluster-lb.yml
+
+        #    - name: Executing the installation and configuration playbook backend 
+        #import_tasks: playbook_conf-backend.yml
+
+
+

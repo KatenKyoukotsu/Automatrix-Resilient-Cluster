@@ -1,24 +1,53 @@
 services:
+  
   backend1:
-    build: backend1/
+    image: debian:latest
     ports:
       - "8080:5001"
+    networks:
+      - my-network
+    build: backend1/ 
+
   backend2:
-    build: backend2/
+    image: debian:latest
     ports:
       - "8080:5002"
+    networks: 
+      - my-network
+    build: backend2
+
   lb1:
-    build: lb1/
+    image: debian:latest
     ports:
       - "80:5003"
+    networks:
+      - my-network
+    build: lb1/
   lb2:
-    build: lb2/
+    image: debian:latest
     ports:
       - "80:5004"
-  ansible:
-    build: ansible/
+    networks: 
+      - my-network
+    build: lb2/
 
+  ansible:
+    image: debian:latest
+    build: ansible/
+    networks:
+        - my-network
+    volumes:
+      - ./ansible/playbooks:/ansible/playbooks/
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: ["/bin/sh", "-c", "ansible-playbook /ansible/playbooks/playbook_main.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-lb.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-cluster-lb.yml &&  ansible-playbook /ansible/playbooks/playbook_conf-backend.yml"]
+    depends_on: 
+      - backend1 
+      - backend2 
+      - lb1 
+      - lb2
 
 networks:
-  default:
+  my-network:
+    driver: bridge
     internal: true
+

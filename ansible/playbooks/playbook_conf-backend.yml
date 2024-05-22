@@ -1,0 +1,21 @@
+    - name: Creating container backend1
+      docker_container:
+        name: backend1
+        image: debian:latest   # Образ на основе Debian
+        state: started
+        ports:
+          - "8080:80"
+        volumes:
+          - nodes/backend1/ports.conf:/etc/apache2/ports.conf
+          - nodes/backend1/index.html:/var/www/html/index.html
+
+    - name: Creating container backend2
+      docker_container:
+        name: backend2
+        image: debian:latest   # Образ на основе Debian
+        state: started
+        ports:
+          - "8080:80"
+        volumes:
+          - nodes/backend2/ports.conf:/etc/apache2/ports.conf
+          - nodes/backend2/index.html:/var/www/html/index.html

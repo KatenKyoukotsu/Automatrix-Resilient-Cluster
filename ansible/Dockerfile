@@ -1,19 +1,35 @@
 # Using python for ansible 
-FROM python:3.9
+FROM debian:latest
 
-# install pachage 
-RUN pip install ansible docker
+# install pachage
+ENV DEBIAN_FRONTEND=nonineractive
+
+RUN apt-get update && \
+    apt-get install -y \
+    software-properties-common \
+    python3-pip \ 
+    pcs \
+    python3-apt && \
+    apt-get clean
+
+
+RUN pip install --break-system-packages ansible requests
+
 
 # copy playbook and conf
-COPY ansible/ /ansible
-
-# copy all Dockerfile 
-COPY ./*.Dockerfile /
-
-# Apply working directory 
-WORKDIR /ansible
+COPY nodes/ ~/
 
 # install virual environment for Ansimble
 ENV ANSIBLE_HOSTS=/etc/ansible/hosts
 ENV ANSIBLE_CONFIG=/ansible/ansible.cfg
+
+RUN ansible-galaxy collection install community.docker
+
+RUN mkdir -p /ansible/playbooks 
+
+WORKDIR /ansible/playbooks
+
+COPY ./playbooks /ansible/playbooks
+
+COPY hosts /etc/ansible/hosts
 
