@@ -1,5 +1,5 @@
 - name: Настройка кластера Pacemaker
-  hosts: lb1,lb2
+  hosts: loadbalancers
   become: yes
   tasks:
     - name: Установить Pacemaker и Corosync
@@ -42,4 +42,3 @@
 
     - name: Настроить ресурс Nginx
       command: pcs resource create nginx systemd:nginx op monitor interval=30s
-

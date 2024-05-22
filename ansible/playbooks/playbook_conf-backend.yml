@@ -1,5 +1,5 @@
 - name: Установка и настройка бэкендов
-  hosts: backend1,backend2
+  hosts: backends
   become: yes
   tasks:
     - name: Установить Apache
@@ -24,4 +24,3 @@
         name: apache2
         state: started
         enabled: yes
-

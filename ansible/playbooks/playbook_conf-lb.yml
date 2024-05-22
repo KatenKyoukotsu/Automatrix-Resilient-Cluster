@@ -1,5 +1,5 @@
 - name: Установка и настройка балансировщиков
-  hosts: lb1,lb2
+  hosts: loadbalancers
   become: yes
   tasks:
     - name: Установить Nginx
@@ -18,4 +18,3 @@
         name: nginx
         state: started
         enabled: yes
-
