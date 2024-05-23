@@ -7,8 +7,21 @@
         state: directory
         mode: 0700
 
+    - name: Copy SSH private key
+      copy:
+        src: /root/.ssh/id_rsa
+        dest: /root/.ssh/id_rsa
+        mode: 0600
+
     - name: Copy SSH public key
       copy:
         src: /root/.ssh/id_rsa.pub
-        dest: /root/.ssh/authorized_keys
+        dest: /root/.ssh/id_rsa.pub
+        mode: 0644
+
+    - name: Ensure authorized_keys contains the public key
+      lineinfile:
+        path: /root/.ssh/authorized_keys
+        line: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+        create: yes
         mode: 0600
