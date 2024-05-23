@@ -8,4 +8,7 @@ RUN mkdir -p /root/.ssh
 COPY id_rsa.pub /root/.ssh/authorized_keys
 RUN chmod 600 /root/.ssh/authorized_keys
 
+# Конфигурация supervisord
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 CMD ["sh", "-c", "service ssh start && nginx -g 'daemon off;'"]

@@ -11,11 +11,12 @@
         state: present
         update_cache: yes
 
+
     - name: Запустить и включить pcsd
-      service:
-        name: pcsd
-        state: started
-        enabled: yes
+      command: service pcsd start
+
+    - name: Убедиться, что pcsd включен
+      command: service pcsd enable
 
     - name: Установить пароль для пользователя hacluster
       expect:
