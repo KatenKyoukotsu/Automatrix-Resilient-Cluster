@@ -25,9 +25,6 @@ services:
     ports:
       - "80:80"
       - "2223:22"
-    depends_on:
-      - backend1
-      - backend2
     networks:
       - my-network
 
@@ -37,9 +34,6 @@ services:
     ports:
       - "81:80"
       - "2224:22"
-    depends_on:
-      - backend1
-      - backend2
     networks:
       - my-network
 
@@ -61,4 +55,4 @@ services:
 networks:
   my-network:
     driver: bridge
-    internal: true
+    external: false
