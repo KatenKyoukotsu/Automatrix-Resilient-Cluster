@@ -10,11 +10,12 @@
 
     - name: Копировать конфигурацию Nginx
       copy:
-        src: /ansible/playbooks/nginx.conf
+        src: /ansible/playbooks/config/nginx.conf
         dest: /etc/nginx/nginx.conf
+        remote_src: no
 
-    - name: Запустить и включить Nginx
-      service:
-        name: nginx
-        state: started
-        enabled: yes
+    # - name: Перезапустить Nginx
+    #   command: service nginx restart
+
+    # - name: Убедиться, что Nginx включен
+    #   command: service nginx start
