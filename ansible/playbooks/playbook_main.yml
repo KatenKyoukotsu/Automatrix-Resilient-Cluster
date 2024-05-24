@@ -1,8 +1,12 @@
 - name: Основной плейбук
-  hosts: all
+  hosts: all, loadbalancers, backends
   tasks:
-    - name: Проверка доступности хостов
-      ping:
+
+    - name: Copy SSH
+      include_tasks: playbook_copy_ssh.yml
+
+    - name: Setting yp balancers
+      include_tasks: playbook_conf-lb.yml
 
 
 
