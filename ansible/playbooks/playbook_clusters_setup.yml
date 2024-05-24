@@ -1,0 +1,61 @@
+  - name: Установить Pacemaker и Corosync
+    hosts: loadbalancers
+    tasks:
+    
+      - name: Task specified for load balancers
+        apt:
+          name:
+              - pacemaker
+              - corosync
+              - pcs
+              - expect
+          state: present
+          update_cache: yes
+
+      - name: Запустить и включить службы pacemaker, corosync и pcsd
+        service:
+          name: "{{ item }}"
+          state: started
+          enabled: yes
+          loop:
+          - pacemaker
+          - corosync
+          - pcsd
+
+      - name: Authenticate hacluster user on lb1
+        expect:
+          command: pcs host auth lb1 -u hacluster -p 123
+          responses:
+            'Password:': '123'
+        register: auth_result_lb1
+        delegate_to: lb1
+      - debug:
+          var: auth_result_lb1
+
+      - name: Authenticate hacluster user on lb2
+        expect:
+          command: pcs host auth lb2 -u hacluster -p 123
+          responses:
+            'Password:': '123'
+        register: auth_result_lb2
+        delegate_to: lb2
+      - debug:
+          var: auth_result_lb2
+
+      - name: Check known-hosts file on lb1
+        ansible.builtin.stat:
+          path: /var/lib/pcsd/known-hosts
+        register: known_hosts_lb1
+
+      - name: Check known-hosts file on lb2
+        ansible.builtin.stat:
+          path: /var/lib/pcsd/known-hosts
+        register: known_hosts_lb2
+        delegate_to: lb2
+
+      - name: Настроить кластер
+        command: pcs cluster setup --force cluster_lb lb1 lb2
+        register: cluster_setup
+        when: known_hosts_lb1.stat.exists and known_hosts_lb2.stat.exists
+      - debug:
+          var: cluster_setup

@@ -29,7 +29,11 @@ services:
 #    hostname: lb1
     ports:
       - "8085:80"
-      - "2223:22"
+      - "2219:22"
+      - "5407:5405/udp"
+      - "2225:2224/tcp"  # Использование другого порта хоста
+      - "3121:3121/tcp"
+      - "3122:3122/tcp"
     networks:
       - my-network
     depends_on:
@@ -42,7 +46,11 @@ services:
 #   hostname: lb2
     ports:
       - "40000:80"
-      - "2224:22"
+      - "2220:22"
+      - "5406:5405/udp"
+      - "2226:2224/tcp"  # Использование другого порта хоста
+      - "3123:3121/tcp"  # Использование другого порта хоста
+      - "3124:3122/tcp"  # Использование другого порта хоста
     networks:
       - my-network
     depends_on:
@@ -52,22 +60,24 @@ services:
   ansible:
     build: ansible/
     ports:
-      - "2225:22"
+      - "2230:22"
     container_name: ansible
     networks:
       - my-network
     volumes:
-      - ./ansible/playbooks:/ansible/playbooks
-      - ./ssh:/root/.ssh
-      - ./entrypoint.sh:/entrypoint.sh
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ./ansible:/ansible
+      - ./ansible/entrypoint.sh:/entrypoint.sh
 #    entrypoint: ["/bin/bash", "service", "ssh", "start", "&&", "/bin/bash", "-c", "sleep infinity"]
-    entrypoint: /entrypoint.sh
+#    entrypoint: /entrypoint.sh
     depends_on:
       - backend1
       - backend2
       - lb1
       - lb2
+    cap_add:
+      - SYS_NICE
+      - SYS_RESOURCE
+      - SYS_ADMIN
     privileged: true
 
 networks:

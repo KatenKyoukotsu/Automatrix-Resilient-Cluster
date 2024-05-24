@@ -1,7 +1,0 @@
-[loadbalancers]
-lb1 ansible_host=lb1 ansible_ssh_user=root
-lb2 ansible_host=lb2 ansible_ssh_user=root
-
-[backends]
-backend1 ansible_host=backend1 ansible_ssh_user=root
-backend2 ansible_host=backend2 ansible_ssh_user=root

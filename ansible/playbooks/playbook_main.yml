@@ -1,16 +1,4 @@
-- name: Основной плейбук
-  hosts: all
-  tasks:
-
-  #  - name: Copy SSH
-  #    include_tasks: playbook_copy_ssh.yml
-
-    - name: Setting up password to user hacluster
-      shell: "echo hacluster:yourpassword | chpasswd"
-
-
-    - name: Setting up balancers
-      include_tasks: playbook_conf-lb.yml
-
-
-
+  - import_playbook: playbook_user_setup.yml
+  - import_playbook: playbook_corosync_generate_key.yml
+  - import_playbook: playbook_nginx_setup.yml
+  - import_playbook: playbook_clusters_setup.yml

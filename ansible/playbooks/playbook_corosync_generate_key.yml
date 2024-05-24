@@ -1,0 +1,36 @@
+  - name: Configuring corosync
+    hosts: localhost
+    tasks:   
+
+    - name: Generate corosync authkey
+      ansible.builtin.shell: |
+        corosync-keygen -l
+      args:
+        creates: /etc/corosync/authkey
+
+    - name: Fetch corosync authkey
+      ansible.builtin.fetch:
+        src: /etc/corosync/authkey
+        dest: /tmp/authkey
+        flat: yes
+
+    - name: Create corosync directory
+      file:
+        path: /etc/corosync
+        state: directory
+        owner: hacluster
+        mode: '0600'
+      delegate_to: "{{ item }}"
+      with_items:
+        - lb1
+        - lb2
+
+    - name: Distribute corosync authkey to other nodes
+      ansible.builtin.copy:
+        src: /tmp/authkey
+        dest: /etc/corosync/authkey
+        mode: '0600'
+      delegate_to: "{{ item }}"
+      with_items:
+        - lb1
+        - lb2

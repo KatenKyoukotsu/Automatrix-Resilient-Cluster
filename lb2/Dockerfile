@@ -5,11 +5,13 @@ RUN mkdir -p /var/run/sshd /var/log/supervisor
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Добавление публичного ключа в authorized_keys
-RUN mkdir -p /root/.ssh
-COPY id_rsa.pub /root/.ssh/authorized_keys
-RUN chmod 600 /root/.ssh/authorized_keys
 
 # Конфигурация supervisord
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+COPY ssh/* /root/.ssh/
+RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+
+RUN service ssh start
 
 CMD ["/usr/bin/supervisord"]
