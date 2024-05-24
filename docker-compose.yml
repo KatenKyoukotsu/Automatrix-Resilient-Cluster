@@ -55,4 +55,62 @@ services:
 networks:
   my-network:
     driver: bridge
-    external: false
+
+# version: '3.8'
+
+# services:
+#   backend1:
+#     build: backend1/
+#     container_name: backend1
+#     ports:
+#       - "8081:8080"
+#       - "2221:22"
+#     networks:
+#       - my-network
+
+#   backend2:
+#     build: backend2/
+#     container_name: backend2
+#     ports:
+#       - "8082:8080"
+#       - "2222:22"
+#     networks:
+#       - my-network
+
+#   lb1:
+#     build: lb1/
+#     container_name: lb1
+#     ports:
+#       - "80:80"
+#       - "2223:22"
+#     networks:
+#       - my-network
+
+#   lb2:
+#     build: lb2/
+#     container_name: lb2
+#     ports:
+#       - "81:80"
+#       - "2224:22"
+#     networks:
+#       - my-network
+
+#   ansible:
+#     build: ansible/
+#     container_name: ansible
+#     networks:
+#       - my-network
+#     volumes:
+#       - ./ansible/playbooks:/ansible/playbooks
+#       - ./ssh:/root/.ssh
+#     entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+#     depends_on:
+#       - backend1
+#       - backend2
+#       - lb1
+#       - lb2
+
+# networks:
+#   my-network:
+#     driver: bridge
+#     # external: false
