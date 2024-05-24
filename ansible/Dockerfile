@@ -1,5 +1,6 @@
 FROM debian:latest
 RUN apt-get update && apt-get install -y ansible pacemaker pcs corosync openssh-server sudo sshpass nginx apache2
+RUN ansible-galaxy collection install community.docker
 COPY ./playbooks /ansible/playbooks
 
 RUN pip install passlib

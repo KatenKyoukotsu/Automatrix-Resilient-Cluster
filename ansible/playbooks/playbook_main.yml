@@ -2,21 +2,12 @@
   hosts: all
   tasks:
 
-    - name: Create cesoneemz group
-      group:
-        name: cesoneemz
-        state: present
-
-    - name: Ensure cesoneemz user exists
-      user:
-        name: cesoneemz
-        password: "{{ 'yourpassword' | password_hash('sha512', 'mysecretsalt') }}"
-        state: present
-        groups: cesoneemz,sudo,haclient
-        shell: /bin/bash
-
   #  - name: Copy SSH
   #    include_tasks: playbook_copy_ssh.yml
+
+    - name: Setting up password to user hacluster
+      shell: "echo hacluster:yourpassword | chpasswd"
+
 
     - name: Setting up balancers
       include_tasks: playbook_conf-lb.yml

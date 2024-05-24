@@ -2,6 +2,12 @@
 # Запуск SSH сервиса
 ulimit -n 65536
 
+apt-get install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install docker-ce
+
 
 # Имя пользователя и пароль
 
@@ -11,7 +17,7 @@ service pacemaker start
 service corosync start
 service pcsd start
 
-USERNAME="cesoneemz"
+USERNAME="hacluster"
 PASSWORD="yourpassword"
 
 # Проверяем, существует ли пользователь
@@ -24,14 +30,14 @@ else
     # Устанавливаем пароль
     echo "$USERNAME:$PASSWORD" | sudo chpasswd
 
-     if ! grep -q '^cesoneemz:' /etc/group; then
-        sudo groupadd cesoneemz
-        echo "Группа cesoneemz создана."
+     if ! grep -q '^hacluster:' /etc/group; then
+        sudo groupadd hacluster
+        echo "Группа hacluster создана."
     fi
 
     # Добавляем пользователя в группу sudo
     if grep -q '^sudo:' /etc/group; then
-        sudo usermod -aG haclient,cesoneemz,sudo "$USERNAME"
+        sudo usermod -aG haclient,hacluster,sudo "$USERNAME"
         echo "Пользователь $USERNAME добавлен в группу sudo."
     else
         echo "Группа sudo не существует. Проверьте наличие и правильность настройки sudo."

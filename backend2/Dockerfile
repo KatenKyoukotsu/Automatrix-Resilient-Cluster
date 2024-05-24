@@ -6,6 +6,8 @@ RUN echo "Listen 8080" > /etc/apache2/ports.conf
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf
 RUN ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
 
+RUN pip install docker
+
 # Добавление публичного ключа в authorized_keys
 RUN mkdir -p /root/.ssh
 COPY id_rsa.pub /root/.ssh/authorized_keys

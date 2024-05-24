@@ -18,6 +18,12 @@
     - debug:
         var: install_check.stdout_lines
 
+    - name: Запустить pacemaker
+      command: service pacemaker start
+      register: pacemaker_start
+    - debug:
+        var: pacemaker_start
+
     - name: Запустить corosync
       command: service corosync start
       register: corosync_start
@@ -40,16 +46,15 @@
       file:
         path: /var/lib/pcsd
         state: directory
-        owner: cesoneemz
-        group: cesoneemz
+        owner: hacluster
         mode: '0755'
 
 #    - name: Ensure known-hosts file exists
 #      file:
 #        path: /var/lib/pcsd/known-hosts
 #        state: touch
-#        owner: cesoneemz
-#        group: cesoneemz
+#        owner: hacluster
+#        group: hacluster
 #        mode: '0755'
 
     - name: Generate SSH key pair for each host
@@ -61,15 +66,13 @@
       command: cat /root/.ssh/id_rsa.pub
       register: ssh_pub_key
 
-
     - name: Add SSH key to known_hosts
       lineinfile:
         path: /var/lib/pcsd/known-hosts
-        line: "{{ inventory_hostname }} {{ ssh_pub_key.stdout }}"
+        line: "{{ inventory_hostname }},{{ hostvars[inventory_hostname].ansible_host }} {{ ssh_pub_key.stdout }}"
         create: yes
-        owner: cesoneemz
-        group: cesoneemz
-        mode: '0600'
+        owner: hacluster
+        mode: '0755'
 
     - name: Gather SSH host keys from all nodes
       command: ssh-keyscan -H {{ inventory_hostname }}
@@ -82,10 +85,9 @@
     - name: Add gathered SSH keys to known_hosts
       lineinfile:
         path: /var/lib/pcsd/known-hosts
-        line: "{{ inventory_hostname }}  {{ ssh_keys.stdout }}"
-        owner: cesoneemz
-        group: cesoneemz
-        mode: '0600'
+        line: "{{ inventory_hostname }},{{ hostvars[inventory_hostname].ansible_host }} {{ ssh_keys.stdout }}"
+        owner: hacluster
+        mode: '0755'
       when: ssh_keys.stdout is defined and ssh_keys.stdout != ""
         
 
@@ -93,8 +95,7 @@
       file:
         path: /var/lib/pcsd
         state: directory
-        owner: cesoneemz
-        group: cesoneemz
+        owner: hacluster
         mode: '0700'
 
 
@@ -109,12 +110,11 @@
     - name: Ensure correct permissions on known-hosts
       file:
         path: /var/lib/pcsd/known-hosts
-        owner: cesoneemz
-        group: cesoneemz
+        owner: hacluster
         mode: '0600'
     
-    - name: Authenticate cesoneemz user on all nodes
-      command: pcs host auth lb1 lb2 -u cesoneemz -p yourpassword
+    - name: Authenticate hacluster user on all nodes
+      command: pcs cluster auth lb1 lb2 -u hacluster -p yourpassword
       register: auth_result
 
     - name: Check auth
