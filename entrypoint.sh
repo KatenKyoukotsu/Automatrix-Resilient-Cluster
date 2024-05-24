@@ -4,7 +4,14 @@ ulimit -n 65536
 
 
 # Имя пользователя и пароль
-USERNAME="hacluster"
+
+service ssh start
+service nginx start
+service pacemaker start
+service corosync start
+service pcsd start
+
+USERNAME="cesoneemz"
 PASSWORD="yourpassword"
 
 # Проверяем, существует ли пользователь
@@ -17,24 +24,19 @@ else
     # Устанавливаем пароль
     echo "$USERNAME:$PASSWORD" | sudo chpasswd
 
+     if ! grep -q '^cesoneemz:' /etc/group; then
+        sudo groupadd cesoneemz
+        echo "Группа cesoneemz создана."
+    fi
+
     # Добавляем пользователя в группу sudo
     if grep -q '^sudo:' /etc/group; then
-        sudo usermod -aG sudo "$USERNAME"
+        sudo usermod -aG haclient,cesoneemz,sudo "$USERNAME"
         echo "Пользователь $USERNAME добавлен в группу sudo."
     else
         echo "Группа sudo не существует. Проверьте наличие и правильность настройки sudo."
     fi
 fi
-
-
-service ssh start
-service nginx start
-service pacemaker start
-service corosync start
-service pcsd start
-
-pcs host auth lb1 -u hacluster -p yourpassword
-pcs host auth lb2 -u hacluster -p yourpassword
 
 # Запустить бесконечный цикл, чтобы контейнер не завершил выполнение
 sleep infinity

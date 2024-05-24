@@ -2,6 +2,8 @@ FROM debian:latest
 RUN apt-get update && apt-get install -y ansible pacemaker pcs corosync openssh-server sudo sshpass nginx apache2
 COPY ./playbooks /ansible/playbooks
 
+RUN pip install passlib
+
 RUN mkdir /var/run/sshd  # Создание необходимой директории
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin without-password/' /etc/ssh/sshd_config
 

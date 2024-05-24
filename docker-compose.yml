@@ -4,26 +4,29 @@ services:
   backend1:
     build: backend1/
     container_name: backend1
+#    hostname: backend1
     ports:
       - "8081:8080"
       - "2221:22"
     networks:
       - my-network
-#    privileged: true
+    privileged: true
 
   backend2:
     build: backend2/
     container_name: backend2
+#    hostname: backend2
     ports:
       - "8082:8080"
       - "2222:22"
     networks:
       - my-network
-#    privileged: true
+    privileged: true
 
   lb1:
     build: lb1/
     container_name: lb1
+#    hostname: lb1
     ports:
       - "8085:80"
       - "2223:22"
@@ -31,11 +34,12 @@ services:
       - my-network
     depends_on:
       - backend1
-#    privileged: true
+    privileged: true
 
   lb2:
     build: lb2/
     container_name: lb2
+#   hostname: lb2
     ports:
       - "40000:80"
       - "2224:22"
@@ -43,7 +47,7 @@ services:
       - my-network
     depends_on:
       - backend2
-#    privileged: true
+    privileged: true
 
   ansible:
     build: ansible/
