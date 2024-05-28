@@ -1,4 +1,4 @@
-[loadbalancers]
+[load_balancers]
 lb1 ansible_host=lb1 ansible_ssh_user=root
 lb2 ansible_host=lb2 ansible_ssh_user=root
 

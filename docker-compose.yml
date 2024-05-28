@@ -1,116 +1,68 @@
 version: '3.8'
 
 services:
-  backend1:
-    build: backend1/
-    container_name: backend1
-    ports:
-      - "8081:8080"
-      - "2221:22"
-    networks:
-      - my-network
-
-  backend2:
-    build: backend2/
-    container_name: backend2
-    ports:
-      - "8082:8080"
-      - "2222:22"
-    networks:
-      - my-network
 
   lb1:
-    build: lb1/
-    container_name: lb1
-    ports:
-      - "80:80"
-      - "2223:22"
+    build: lb1/  # Сборка образа из директории lb1
+    container_name: lb1  # Задание имени контейнера
     networks:
-      - my-network
+      - cluster  # Подключение к сети cluster
+    privileged: true  # Запуск контейнера с привилегиями
+    ports:
+      - "8081:80"  # Проброс порта 80 внутри контейнера на 8081 хоста
+    environment:
+      - NODE=lb1  # Установка переменной окружения NODE
+      - VIRTUAL_HOST=10.0.0.100  # Установка переменной окружения VIRTUAL_HOST
 
   lb2:
-    build: lb2/
-    container_name: lb2
+    build: lb2/  # Сборка образа из директории lb2
+    container_name: lb2  # Задание имени контейнера
+    networks:
+      - cluster  # Подключение к сети cluster
+    privileged: true  # Запуск контейнера с привилегиями 
     ports:
-      - "81:80"
-      - "2224:22"
-    networks:
-      - my-network
+      - "8082:80"  # Проброс порта 80 внутри контейнера на 8082 хоста
+    environment:
+      - NODE=lb2  # Установка переменной окружения NODE
+      - VIRTUAL_HOST=10.0.0.100  # Установка переменной окружения VIRTUAL_HOST
 
-  ansible:
-    build: ansible/
-    container_name: ansible
+  backend1:
+    build: backend1/  # Сборка образа из директории backend1
+    container_name: backend1  # Задание имени контейнера
+    privileged: true  # Запуск контейнера с привилегиями
     networks:
-      - my-network
-    volumes:
-      - ./ansible/playbooks:/ansible/playbooks
-      - ./ssh:/root/.ssh
-    entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+      cluster:
+        aliases:
+          - backend1  # Добавление алиаса для контейнера в сети
+
+  backend2:
+    build: backend2/  # Сборка образа из директории backend2
+    container_name: backend2  # Задание имени контейнера
+    privileged: true  # Запуск контейнера с привилегиями
+    networks:
+      cluster:
+        aliases:
+          - backend2  # Добавление алиаса для контейнера в сети
+
+  host:
+    build: ansible/  # Сборка образа из директории ansible
+    container_name: ansible  # Задание имени контейнера
+    networks:
+      cluster:
+        aliases:
+          - ansible  # Добавление алиаса для контейнера в сети
     depends_on:
-      - backend1
-      - backend2
-      - lb1
-      - lb2
+      - lb1  # Зависимость от контейнера lb1
+      - lb2  # Зависимость от контейнера lb2
+      - backend1  # Зависимость от контейнера backend1
+      - backend2  # Зависимость от контейнера backend2
+    privileged: true  # Запуск контейнера с привилегиями
+    volumes:
+      - ./ansible/ansible:/ansible  # Монтирование локальной директории ansible в контейнер
 
 networks:
-  my-network:
-    driver: bridge
-
-# version: '3.8'
-
-# services:
-#   backend1:
-#     build: backend1/
-#     container_name: backend1
-#     ports:
-#       - "8081:8080"
-#       - "2221:22"
-#     networks:
-#       - my-network
-
-#   backend2:
-#     build: backend2/
-#     container_name: backend2
-#     ports:
-#       - "8082:8080"
-#       - "2222:22"
-#     networks:
-#       - my-network
-
-#   lb1:
-#     build: lb1/
-#     container_name: lb1
-#     ports:
-#       - "80:80"
-#       - "2223:22"
-#     networks:
-#       - my-network
-
-#   lb2:
-#     build: lb2/
-#     container_name: lb2
-#     ports:
-#       - "81:80"
-#       - "2224:22"
-#     networks:
-#       - my-network
-
-#   ansible:
-#     build: ansible/
-#     container_name: ansible
-#     networks:
-#       - my-network
-#     volumes:
-#       - ./ansible/playbooks:/ansible/playbooks
-#       - ./ssh:/root/.ssh
-#     entrypoint: ["/bin/sh", "-c", "sleep infinity"]
-#     depends_on:
-#       - backend1
-#       - backend2
-#       - lb1
-#       - lb2
-
-# networks:
-#   my-network:
-#     driver: bridge
-#     # external: false
+  cluster:
+    driver: bridge  # Использование сетевого драйвера bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24  # Задание подсети для сети

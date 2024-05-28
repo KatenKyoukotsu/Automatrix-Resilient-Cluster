@@ -1,0 +1,5 @@
+
+  - import_playbook: playbook_install_packages.yml
+  - import_playbook: playbook_corosync_generate_key.yml
+  - import_playbook: playbook_setup_clusters.yml
+  - import_playbook: playbook_setup_backends.yml
