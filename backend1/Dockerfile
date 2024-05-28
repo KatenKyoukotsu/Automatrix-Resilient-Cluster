@@ -1,15 +1,32 @@
-FROM debian:latest
-RUN apt-get update && apt-get install -y apache2 openssh-server
-RUN mkdir /var/run/sshd
-RUN echo "Listen 8080" > /etc/apache2/ports.conf
-RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf
-RUN ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
+#!/bin/bash
 
-# Добавление публичного ключа в authorized_keys
-COPY ssh/* /root/.ssh/
-RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+service ssh start
+
+# LB1_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' lb1)
+# LB2_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' lb2)
+
+# tail -f /dev/null
+
+# # Проверяем, что IP-адреса были получены
+# if [ -z "$LB1_IP" ] || [ -z "$LB2_IP" ]; then
+#   echo "Не удалось получить IP-адреса контейнеров lb1 и lb2"
+#   exit 1
+# fi
+
+# # Обновляем /etc/hosts
+# echo "$LB1_IP lb1" >> /etc/hosts
+# echo "$LB2_IP lb2" >> /etc/hosts
+
+# echo "Файл /etc/hosts успешно обновлен"
 
 
-RUN service ssh start
 
-CMD ["sh", "-c", "service ssh start && apache2ctl -D FOREGROUND"]
+ssh-keyscan lb1 >> /root/.ssh/known_hosts
+ssh-keyscan lb2 >> /root/.ssh/known_hosts
+
+ssh-keyscan backend1 >> /root/.ssh/known_hosts
+ssh-keyscan backend2 >> /root/.ssh/known_hosts
+
+ansible-playbook -i ansible/playbooks/inventory ansible/playbooks/playbook_main.yml
+
+tail -f /dev/null
