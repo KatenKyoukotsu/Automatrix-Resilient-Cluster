@@ -1,63 +1,111 @@
 # Automatrix-Resilient-Cluster
+Данный проект представляет собой отказоустойчивую систему, с автоматизацей установки и настройки 
 
-# Шаг 1: Создание SSH ключей
+# Краткое объяснение
+Проект из себя представляет 5 контейнеров в своём сетевом пространстве (`bridge`) и состоит из следующих элементов:
+`
+- балансировщик нода 1 `lb1`
+- балансировщик нода 2 `lb2`
+- бэкэнд нода 1 `backend1`
+- бэкэнд нода 2 `backend2`
+- сервер автоматизации `ansible`
+`
 
-На хосте создайте SSH ключи, если они еще не созданы:
-
+# Древо проекта 
 ```
-ssh-keygen -t rsa -b 4096 -f ./ssh/id_rsa -N ""
+├── ansible
+│   ├── ansible
+│   │   └── playbooks
+│   │       ├── ansible.cfg
+│   │       ├── inventory
+│   │       ├── nahdlers
+│   │       │   └── playbook_handlers.yml
+│   │       ├── playbook_corosync_generate_key.yml
+│   │       ├── playbook_install_packages.yml
+│   │       ├── playbook_main.yml
+│   │       ├── playbook_setup_backends.yml
+│   │       └── playbook_setup_clusters.yml
+│   ├── Dockerfile
+│   ├── entrypoint.sh
+│   └── ssh
+│       ├── id_rsa
+│       └── id_rsa.pub
+├── backend1
+│   ├── Dockerfile
+│   ├── index.html
+│   └── ssh
+│       ├── id_rsa
+│       └── id_rsa.pub
+├── backend2
+│   ├── Dockerfile
+│   ├── indsx.html
+│   └── ssh
+│       ├── id_rsa
+│       └── id_rsa.pub
+├── docker-compose.yml
+├── lb1
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── ssh
+│       ├── id_rsa
+│       └── id_rsa.pub
+├── lb2
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── ssh
+│       ├── id_rsa
+│       └── id_rsa.pub
+└── README.md
 ```
 
-# Шаг 2: Копирование публичного ключа
-
-Скопируйте созданный публичный ключ в директории контейнеров `backend1`, `backend2`, `lb1`, `lb2`.
-
+# Подготовка к запуску проекта 
+Склонируйте репозиторий на свою хостовую машину:
 ```
-cp ./ssh/id_rsa.pub ./backend1/
-cp ./ssh/id_rsa.pub ./backend2/
-cp ./ssh/id_rsa.pub ./lb1/
-cp ./ssh/id_rsa.pub ./lb2/
+git clone https://github.com/KatenKyoukotsu/Automatrix-Resilient-Cluster.git
 ```
-
-# Шаг 3: Запуск Docker Compose
-
-Теперь, когда публичные ключи добавлены в соответствующие директории, запустите Docker Compose:
-
+Для запуска проекта стоит убидиться в установленном docker-compose на хостовой машине
+Если докер не установлен установите его командой:
 ```
-docker-compose up --build
+sudo apt-get install docker-compose -y 
 ```
 
-# Шаг 4: Запуск Ansible Playbooks
+# Далее запускаем проект
+Запуск плейбуков настроен автоматически, поэтому ручками запуска ansible скрипты не требуется, в следствии остаётся только запусть `docker-compose.yml` командой:
+```
+sudo docker-compose up --build 
+```
+В итоге получаем поднятые 5 контейнеров, настроенный через ansible
 
-Подключитесь к контейнеру `ansible` и выполните плейбук для копирования SSH ключей:
-
+# Проверка отказоустойчивости
+Попадём в `ansible` контейнер для проверки отказоустойчивости кластера:
 ```
 docker exec -it ansible /bin/bash
-ansible-playbook /ansible/playbooks/playbook_copy_ssh.yml
 ```
-
-Запустите основной плейбук:
-
+Проверим кто является владельцем vip адреса (`важное примечание ansible не моментально поднимает loadbalancer, поэтому стоит перепровить несколько раз что они подняты со статусом Started`) 
 ```
-ansible-playbook /ansible/playbooks/playbook_main.yml
+pcs status
 ```
-
-Настройте балансировщики:
-
+Далее проверим работу кластера 
+'''
+curl http://10.0.0.100:8081
+curl http://10.0.0.100:8082
+'''
+Получаем html код страничек `backend1` и `backend2`, по типу:
 ```
-ansible-playbook /ansible/playbooks/playbook_conf-lb.yml
+<!DOCTYPE html>
+<meta charset="utf-8"> 
+<html>
+<head>
+    <title>Backend</title>
+</head>
+<body>
+    <h1>Бэкенд 1</h1>
+</body>
+</html>
 ```
-
-Настройте кластер Pacemaker:
-
-```
-ansible-playbook /ansible/playbooks/playbook_conf-cluster-lb.yml
-```
-
-Настройте бэкенды:
-
-```
-ansible-playbook /ansible/playbooks/playbook_conf-backend.yml
-```
-
-Эти шаги должны обеспечить корректную настройку и работу системы.
+Далее проверяем отказоустойчивость убив процесс одного из `loadbalancer`, для этого используйте команду:
+`sudo docker kill lb1` или `sudo docker kill lb2`
+В итоге остаётся проверить работу кластера с одной нодой из двух, использовав curl несколько раз подрядб в таком случаем вы будете получать html код разных бэкендов(`ВАЖНО, указывать адресс поднятой ноды балансировщика`):
+'''
+curl http://10.0.0.100:8082
+''' 
