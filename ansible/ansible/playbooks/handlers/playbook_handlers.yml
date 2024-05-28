@@ -1,0 +1,14 @@
+  - name: Старт pcsd  # Имя задачи: Старт pcsd
+    shell: |
+      systemctl start pcsd  # Запуск службы pcsd
+    listen: "start pcsd"  # Указание на то, что задача будет выполнена при получении уведомления "start pcsd"
+
+  - name: Старт pcsd-ruby  # Имя задачи: Старт pcsd-ruby
+    shell: |
+      systemctl start pcsd-ruby  # Запуск службы pcsd-ruby
+    listen: "start pcsd-ruby"  # Указание на то, что задача будет выполнена при получении уведомления "start pcsd-ruby"
+
+  - name: Перезапуск сервиса apache  # Имя задачи: Перезапуск сервиса apache
+    shell: |
+      service apache2 restart  # Перезапуск службы apache2
+    listen: "restart apache"  # Указание на то, что задача будет выполнена при получении уведомления "restart apache"

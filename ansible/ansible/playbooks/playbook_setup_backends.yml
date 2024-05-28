@@ -1,35 +1,34 @@
-  - name: Установить необходимые пакеты
-    hosts: backends
+  - name: Установить необходимые пакеты  # Имя задачи: Установить необходимые пакеты
+    hosts: backends  # Указываем группу хостов, на которых будет выполняться задача
     tasks:
 
-      - name: Установка apache2
+      - name: Установка apache2  # Имя задачи: Установка apache2
         apt:
           name:
-            - apache2
-          state: present
-          update_cache: true
+            - apache2  # Установка пакета apache2
+          state: present  # Убедиться, что пакет установлен
+          update_cache: true  # Обновить кэш пакетов перед установкой
 
-  - name: Сконфигурировать сервер apache
-    hosts: backends
+  - name: Сконфигурировать сервер apache  # Имя задачи: Сконфигурировать сервер apache
+    hosts: backends  # Указываем группу хостов, на которых будет выполняться задача
     tasks:
 
-      - name: Установить порт 8080
+      - name: Установить порт 8080  # Имя задачи: Установить порт 8080 - Запись порта в конфигурационный файл
         shell: |
-          echo "Listen 8080" > /etc/apache2/ports.conf
+          echo "Listen 8080" > /etc/apache2/ports.conf  
 
-      - name: Установить servername на localhost
+      - name: Установить servername на localhost  # Имя задачи: Установить servername на localhost - Запись servername в конфигурационный файл
         shell: |
-          echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf
+          echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf  
 
-      - name: Включить конфиг
+      - name: Включить конфиг  # Имя задачи: Включить конфигурационный файл - Создание символической ссылки для включения конфигурации
         shell: |
-          ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
-        notify: "restart apache"
+          ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf 
+        notify: "restart apache"  # Уведомить хендлер о необходимости перезапуска Apache
 
-      - name: Запустить сервер apache
+      - name: Запустить сервер apache  # Имя задачи: Запустить сервер apache - Запуск Apache в фоновом режиме
         shell: |
-           apache2ctl -D FOREGROUND &
+          apache2ctl -D FOREGROUND &  
 
     handlers:
-      - import_tasks: handlers/playbook_handlers.yml
-
+      - import_tasks: handlers/playbook_handlers.yml  # Импорт хендлеров из файла handlers/playbook_handlers.yml

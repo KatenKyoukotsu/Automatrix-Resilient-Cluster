@@ -1,31 +1,28 @@
-- name: Установить необходимые пакеты на ноды
-  hosts: load_balancers
+- name: Установить необходимые пакеты на ноды  # Имя задачи: Установить необходимые пакеты на ноды
+  hosts: load_balancers  # Указываем группу хостов, на которых будет выполняться задача
   tasks:
 
-    - name: Установка pcs, pacemaker, corosync, nginx, fence-agents
+    - name: Установка pcs, pacemaker, corosync, nginx, fence-agents  # Имя задачи: Установка необходимых пакетов
       apt:
         name:
-          - pcs
-          - pacemaker
-          - fence-agents
-          - corosync
-          - nginx
-        state: present
-        update_cache: true
+          - pcs  # Установка пакета pcs
+          - pacemaker  # Установка пакета pacemaker
+          - fence-agents  # Установка пакета fence-agents
+          - corosync  # Установка пакета corosync
+          - nginx  # Установка пакета nginx
+        state: present  # Убедиться, что пакеты установлены
+        update_cache: true  # Обновить кэш пакетов перед установкой
       notify: 
-        - "start pcsd"
-        - "start pcsd-ruby"
+        - "start pcsd"  # Уведомить хендлер о необходимости запустить pcsd
+        - "start pcsd-ruby"  # Уведомить хендлер о необходимости запустить pcsd-ruby
 
-    - name: Изменить пароль пользователя hacluster
+    - name: Изменить пароль пользователя hacluster  # Имя задачи: Изменить пароль пользователя hacluster
       shell: |
-        echo "hacluster:123" | chpasswd
+        echo "hacluster:123" | chpasswd 
 
-    - name: Удалить на всех нодах существующие кластеры
+    - name: Удалить на всех нодах существующие кластеры  # Имя задачи: Удалить на всех нодах существующие кластеры
       shell: |
-        pcs cluster destroy
+        pcs cluster destroy  
 
   handlers:
-    - import_tasks: handlers/playbook_handlers.yml
-    
-
-      
+    - import_tasks: handlers/playbook_handlers.yml  # Импорт хендлеров из файла handlers/playbook_handlers.yml
