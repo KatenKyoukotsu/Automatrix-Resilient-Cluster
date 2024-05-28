@@ -1,0 +1,31 @@
+- name: Установить необходимые пакеты на ноды
+  hosts: load_balancers
+  tasks:
+
+    - name: Установка pcs, pacemaker, corosync, nginx, fence-agents
+      apt:
+        name:
+          - pcs
+          - pacemaker
+          - fence-agents
+          - corosync
+          - nginx
+        state: present
+        update_cache: true
+      notify: 
+        - "start pcsd"
+        - "start pcsd-ruby"
+
+    - name: Изменить пароль пользователя hacluster
+      shell: |
+        echo "hacluster:123" | chpasswd
+
+    - name: Удалить на всех нодах существующие кластеры
+      shell: |
+        pcs cluster destroy
+
+  handlers:
+    - import_tasks: handlers/playbook_handlers.yml
+    
+
+      

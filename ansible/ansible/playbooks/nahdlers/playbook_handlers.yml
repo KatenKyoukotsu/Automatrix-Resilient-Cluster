@@ -1,0 +1,14 @@
+  - name: Старт pcsd
+    shell: |
+      systemctl start pcsd
+    listen: "start pcsd"
+
+  - name: Старт pcsd-ruby
+    shell: |
+      systemctl start pcsd-ruby
+    listen: "start pcsd-ruby"
+
+  - name: Перезапуск сервиса apache
+    shell: |
+      service apache2 restart
+    listen: "restart apache"

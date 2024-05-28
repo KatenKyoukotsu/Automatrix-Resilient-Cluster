@@ -1,0 +1,22 @@
+- name: Сгенерировать ключи corosync для аутентификации
+  hosts: lb1
+  tasks:
+
+    - name: Генерация ключа corosync
+      ansible.builtin.shell: |
+        corosync-keygen -l
+      args:
+        creates: /etc/corosync/authkey
+
+    - name: Скопировать ключ в директорию ymp
+      ansible.builtin.fetch:
+        src: /etc/corosync/authkey
+        dest: /tmp/authkey
+        flat: yes
+
+    - name: Отправить всем нодам ключ corosync
+      ansible.builtin.copy:
+        src: /tmp/authkey
+        dest: /etc/corosync/authkey
+        mode: '0600'
+      delegate_to: lb2

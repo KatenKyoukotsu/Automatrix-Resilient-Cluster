@@ -1,0 +1,35 @@
+  - name: Установить необходимые пакеты
+    hosts: backends
+    tasks:
+
+      - name: Установка apache2
+        apt:
+          name:
+            - apache2
+          state: present
+          update_cache: true
+
+  - name: Сконфигурировать сервер apache
+    hosts: backends
+    tasks:
+
+      - name: Установить порт 8080
+        shell: |
+          echo "Listen 8080" > /etc/apache2/ports.conf
+
+      - name: Установить servername на localhost
+        shell: |
+          echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf
+
+      - name: Включить конфиг
+        shell: |
+          ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
+        notify: "restart apache"
+
+      - name: Запустить сервер apache
+        shell: |
+           apache2ctl -D FOREGROUND &
+
+    handlers:
+      - import_tasks: handlers/playbook_handlers.yml
+

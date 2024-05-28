@@ -1,0 +1,52 @@
+  - name: Аутентификация нод и установка кластера
+    hosts: lb1
+    tasks:
+
+     - name: Аутентификация pcs на нодах
+       shell: |
+         pcs host auth lb1 lb2 -u hacluster -p 123
+    
+     - name: Конфигурация кластера с именем cluster_lb
+       shell: |
+         pcs cluster setup cluster_lb lb1 lb2 --force
+
+
+  - name: Аутентификация кластера и запуск кластера
+    hosts: lb1
+    tasks:
+
+     - name: Старт кластера с помощью pcs
+       shell: |
+         pcs cluster start --all
+
+     - name: Выключить STONITH (на продакшене рекомендуется включить)
+       shell: |
+         pcs property set stonith-enabled=false
+
+     - name: Добавить ресурс виртуального ip адреса
+       shell: |
+         pcs resource create vip IPaddr2 ip=10.0.0.100 cidr_netmask=24 nic=eth0 clusterip_hash="sourceip-sourceport" op monitor interval=30s
+
+     - name: Включить ресурс виртуального ip адреса
+       shell: |
+         pcs resource enable vip
+
+     - name: Добавить ресурс nginx
+       shell: |
+         pcs resource create nginx systemd:nginx op monitor interval=30s
+
+     - name: Включить ресурс nginx
+       shell: |
+         pcs resource enable nginx
+
+     - name: Клонировать nginx на все ноды
+       shell: |
+         pcs resource clone nginx
+
+     - name: Сконфигурировать ресурс vip так, чтобы он был доступен только на ноде с nginx
+       shell: |
+         pcs constraint colocation add vip with nginx-clone
+
+     - name: Сконфигурировать порядок запуска ресурсов
+       shell: |
+         pcs constraint order start nginx-clone then start vip

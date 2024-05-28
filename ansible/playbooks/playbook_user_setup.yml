@@ -1,8 +1,0 @@
-  - name: Setup hacluster password
-    hosts: loadbalancers
-    tasks:
-
-      - name: Setup to lb1, lb2 
-        user:
-          name: hacluster
-          password: "{{ '123' | password_hash('sha512') }}"
