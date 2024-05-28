@@ -1,17 +1,27 @@
 FROM debian:latest
 
-RUN apt-get update && apt-get install -y nginx pcs pacemaker corosync openssh-server supervisor
-RUN mkdir -p /var/run/sshd /var/log/supervisor
-COPY nginx.conf /etc/nginx/nginx.conf
+RUN apt-get update && apt-get install -y \
+    systemd \
+    systemd-sysv \
+    dbus \
+    openssh-server \
+    python3-pip \
+    && apt-get clean
 
-# Добавление публичного ключа в authorized_keys
+RUN mkdir -p /var/run/sshd && chmod 700 /root/.ssh
 
-# Конфигурация supervisord
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 COPY ssh/* /root/.ssh/
+RUN chmod 600 /root/.ssh/id_rsa
+
 RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 
-RUN service ssh start
+COPY nginx.conf /etc/nginx/nginx.conf
 
-CMD ["/usr/bin/supervisord"]
+EXPOSE 22
+
+CMD ["/lib/systemd/systemd"]
